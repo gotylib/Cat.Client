@@ -1,0 +1,73 @@
+﻿@page "/chats"
+@using Cat.Client.Care
+@using Cat.Client.DataBase
+@using Cat.Client.Infrastructure.Services
+@inject ChatService ChatService
+
+<h3>Chats</h3>
+<button class="btn btn-primary" @onclick="Validate">Click me</button>
+
+@if (valid == 0)
+{
+    <EditForm Model="@dataModel" OnValidSubmit="@SendData">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Name:</label>
+            <InputText @bind-Value="dataModel.Name" />
+        </div>
+        <div>
+            <label>Url:</label>
+            <InputText @bind-Value="dataModel.Url" />
+        </div>
+        <button type="submit">Submit</button>
+    </EditForm>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chat Name</th>
+                <th>URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var chat in chats)
+            {
+                <tr>
+                    <td>@chat.ChatName</td>
+                    <td>@chat.AdditionalId</td>
+                    <td>@chat.Url</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private int valid = 0;
+    private List<ChatServer> chats = new List<ChatServer>();
+    private MyDataModel dataModel = new MyDataModel();
+
+    private async Task Validate()
+    {
+        valid = valid > 0 ? 0 : 1;
+        if (valid == 1)
+        {
+            chats = await ChatService.GetChats();
+        }
+    }
+
+    public class MyDataModel
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }
+    }
+
+    private async Task SendData()
+    {
+        await ChatService.AddChatAsync(dataModel.Name, dataModel.Url);
+    }
+}
