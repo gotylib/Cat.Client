@@ -6,6 +6,7 @@ using Cat.Client.Infrastructure.Services;
 using Cat.Client.Infrastructure.Handlers;
 
 
+
 namespace Cat.Client
 {
     public static class MauiProgram
@@ -27,6 +28,8 @@ namespace Cat.Client
 
             builder.Services.AddDbContext<CatClientDbContext>();
 
+            builder.Services.AddHttpClient();
+
             var dbContext = new CatClientDbContext();
             dbContext.Database.EnsureCreated();
 
@@ -41,6 +44,7 @@ namespace Cat.Client
                 .CreateLogger();
 
             builder.Logging.AddSerilog();
+
 
 #endif
 

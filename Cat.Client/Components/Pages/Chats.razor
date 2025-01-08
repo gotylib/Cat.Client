@@ -1,0 +1,98 @@
+﻿@page "/"
+@using Cat.Client.Care
+@using Cat.Client.DataBase
+@using Cat.Client.Infrastructure.Services
+@inject ChatService ChatService
+@inject NavigationManager NavigationManager
+
+<div class="header">
+    <h3>Chats</h3>
+    <div class="search-container">
+        <img src="images/find.png" alt="Search icon" class="search-icon" />
+        <input class="search-input" value="@searchQuery" @oninput="OnSearchQueryChanged" placeholder="Search chats..." />
+    </div>
+    <button class="add-chat-button" @onclick="TogglePopup">+</button>
+</div>
+
+@if (showPopup)
+{
+    <div class="popup">
+        <div class="popup-content">
+            <h4>Add New Chat</h4>
+            <input @bind="newChatName" placeholder="Chat Name" />
+            <input @bind="newAdditionalId" placeholder="Additional Id" />
+            <input @bind="newUrl" placeholder="URL" />
+            <button @onclick="AddChat">Add</button>
+            <button @onclick="TogglePopup">Cancel</button>
+        </div>
+    </div>
+}
+
+<div class="chat-list-container">
+    <ul class="chat-list">
+        @foreach (var chat in filteredChats)
+        {
+            <li class="chat-item" @onclick="@(() => NavigateToChat(chat.ChatName, chat.AdditionalId, chat.Url))">
+                <div class="chat-info">
+                    <div class="chat-name">@chat.ChatName</div>
+                    <div class="chat-id">@chat.AdditionalId</div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private List<ChatServer> chats = new List<ChatServer>();
+    private List<ChatServer> filteredChats = new List<ChatServer>();
+    private bool showPopup = false;
+    private string newChatName;
+    private int newAdditionalId;
+    private string newUrl;
+    private string searchQuery = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        chats = await ChatService.GetChats();
+        filteredChats = chats; // Инициализируем фильтрованный список
+    }
+
+    private void TogglePopup()
+    {
+        showPopup = !showPopup;
+    }
+
+    private async Task AddChat()
+    {
+        await ChatService.AddChatAsync(newChatName, newUrl);
+        TogglePopup();
+        chats = await ChatService.GetChats(); // Заново загружаем список чатов
+        filteredChats = chats; // Обновляем фильтрованный список
+        StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
+    }
+
+    private void NavigateToChat(string chatName, int additionalId, string url)
+    {
+        var queryString = $"chatName={Uri.EscapeDataString(chatName)}&additionalId={additionalId}&url={Uri.EscapeDataString(url)}";
+        NavigationManager.NavigateTo($"/chatdetail?{queryString}");
+    }
+
+    private void OnSearchQueryChanged(ChangeEventArgs e)
+    {
+        searchQuery = e.Value?.ToString() ?? string.Empty;
+        FilterChats();
+    }
+
+    private void FilterChats()
+    {
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            filteredChats = chats;
+        }
+        else
+        {
+            filteredChats = chats.Where(chat => chat.ChatName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
+    }
+}

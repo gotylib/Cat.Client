@@ -18,32 +18,41 @@
             <InputText @bind-Value="dataModel.Name" />
         </div>
         <div>
+            <label>SubId:</label>
+            <InputNumber @bind-Value="dataModel.SubId" />
+        </div>
+        <div>
             <label>Url:</label>
             <InputText @bind-Value="dataModel.Url" />
         </div>
-        <button type="submit">Submit</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-primary" type="button" @onclick="UpdateData">Update</button>
+        <button class="btn btn-primary" type="button" @onclick="DeleteData">Delete</button>
     </EditForm>
 }
-else
+else if(valid == 1)
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Chat Name</th>
-                <th>URL</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var chat in chats)
-            {
+    <div class="chat-list-container">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@chat.ChatName</td>
-                    <td>@chat.AdditionalId</td>
-                    <td>@chat.Url</td>
+                    <th>Chat Name</th>
+                    <th>URL</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var chat in chats)
+                {
+                    <tr>
+                        <td>@chat.ChatName</td>
+                        <td>@chat.AdditionalId</td>
+                        <td>@chat.Url</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
 }
 
 @code {
@@ -63,11 +72,22 @@ else
     public class MyDataModel
     {
         public string Name { get; set; }
+        public int SubId { get; set; }
         public string Url { get; set; }
     }
 
     private async Task SendData()
     {
         await ChatService.AddChatAsync(dataModel.Name, dataModel.Url);
+    }
+
+    private async Task UpdateData()
+    {
+        await ChatService.UpdateChatAsync(dataModel.Name, dataModel.SubId, dataModel.Url);
+    }
+
+    private async Task DeleteData()
+    {
+        await ChatService.DeleteChatAsync(dataModel.Name, dataModel.SubId);
     }
 }
