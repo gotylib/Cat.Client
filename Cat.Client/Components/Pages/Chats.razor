@@ -4,6 +4,19 @@
 @using Cat.Client.Infrastructure.Services
 @inject ChatService ChatService
 @inject NavigationManager NavigationManager
+<ContextMenu Id="myMenu">
+    <Item OnClick="@OnClick">Item 1</Item>
+    <Item OnClick="@OnClick">Item 2</Item>
+    <Item OnClick="@OnClick" Enabled="false">Item 3 (disabled)</Item>
+    <Seperator />
+    <Item>
+        Submenu
+        <SubMenu>
+            <Item OnClick="@OnClick">Submenu Item 1</Item>
+            <Item OnClick="@OnClick">Submenu Item 2</Item>
+        </SubMenu>
+    </Item>
+</ContextMenu>
 
 <div class="header">
     <h3>Chats</h3>
@@ -11,7 +24,9 @@
         <img src="images/find.png" alt="Search icon" class="search-icon" />
         <input class="search-input" value="@searchQuery" @oninput="OnSearchQueryChanged" placeholder="Search chats..." />
     </div>
-    <button class="add-chat-button" @onclick="TogglePopup">+</button>
+    <button class="add-chat-button" @onclick="TogglePopup">
+        <img class="add-chat-img" src="images/plus.png">
+    </button>
 </div>
 
 @if (showPopup)
@@ -32,12 +47,14 @@
     <ul class="chat-list">
         @foreach (var chat in filteredChats)
         {
+            <ContextMenuTrigger MenuId="myMenu">
             <li class="chat-item" @onclick="@(() => NavigateToChat(chat.ChatName, chat.AdditionalId, chat.Url))">
                 <div class="chat-info">
                     <div class="chat-name">@chat.ChatName</div>
                     <div class="chat-id">@chat.AdditionalId</div>
                 </div>
             </li>
+            </ContextMenuTrigger>
         }
     </ul>
 </div>
@@ -50,6 +67,10 @@
     private int newAdditionalId;
     private string newUrl;
     private string searchQuery = string.Empty;
+    private bool showContextMenu = false;
+    private int menuLeft;
+    private int menuTop;
+    private ChatServer selectedChat;
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,4 +116,21 @@
         }
         StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
     }
+
+
+
+
+
+    private void DeleteChat(ChatServer chat)
+    {
+        // Логика для удаления чата
+        showContextMenu = false;
+        StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
+    }
+    void OnClick(ItemClickEventArgs e)
+    {
+        Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
+    }
 }
+
+

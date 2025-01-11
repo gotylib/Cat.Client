@@ -61,6 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazor.ContextMenu" Version="2.1.0" />
         <PackageReference Include="HtmlSanitizer" Version="8.1.870" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />

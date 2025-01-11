@@ -33,9 +33,11 @@ namespace Cat.Client
             var dbContext = new CatClientDbContext();
             dbContext.Database.EnsureCreated();
 
-            
+            builder.Services.AddBlazorContextMenu();
+
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 
             //Настройка логирования в файл
