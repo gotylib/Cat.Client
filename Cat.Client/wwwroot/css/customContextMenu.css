@@ -1,0 +1,69 @@
+﻿/* customContextMenu.css */
+.blazor-context-menu {
+    border-radius: 10px; /* Пример изменения стиля */
+    background-color: #f0f0f0; /* Пример изменения фона */
+}
+
+.blazor-context-menu__item {
+    display: flex;
+    align-items: flex-end; /* Выравнивание по нижнему краю */
+    border-radius: 10px;
+    color: #333; /* Пример изменения цвета текста */
+    padding: 0.5em; /* Пример изменения отступов */
+}
+
+    .blazor-context-menu__item:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%; /* Ширина линии */
+        height: 1px; /* Толщина линии */
+        background-color: #ccc; /* Цвет линии */
+    }
+
+
+
+    .blazor-context-menu__item:hover .update-img {
+        filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(5000%) hue-rotate(220deg) brightness(90%) contrast(110%);
+    }
+
+.context-delete-item {
+    display: flex;
+    border-radius: 10px;
+    color: red; /* Пример изменения цвета текста */
+    padding: 0.5em; /* Пример изменения отступов */
+}
+
+    .context-delete-item:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%; /* Ширина линии */
+        height: 1px; /* Толщина линии */
+        background-color: #ccc; /* Цвет линии */
+    }
+.context-delete-item .text{
+
+}
+
+.blazor-context-menu__seperator {
+    border-top: 1px solid #ccc; /* Пример изменения разделителя */
+}
+
+.delete-img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    filter: brightness(0) saturate(100%) invert(22%) sepia(55%) saturate(4791%) hue-rotate(345deg);
+}
+
+.update-img {
+    margin-right:10px;
+    width: 20px;
+    height: 20px;
+    
+}

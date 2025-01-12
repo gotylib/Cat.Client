@@ -4,19 +4,12 @@
 @using Cat.Client.Infrastructure.Services
 @inject ChatService ChatService
 @inject NavigationManager NavigationManager
-<ContextMenu Id="myMenu">
-    <Item OnClick="@OnClick">Item 1</Item>
-    <Item OnClick="@OnClick">Item 2</Item>
-    <Item OnClick="@OnClick" Enabled="false">Item 3 (disabled)</Item>
-    <Seperator />
-    <Item>
-        Submenu
-        <SubMenu>
-            <Item OnClick="@OnClick">Submenu Item 1</Item>
-            <Item OnClick="@OnClick">Submenu Item 2</Item>
-        </SubMenu>
-    </Item>
+
+<ContextMenu Id="myMenu" CssClass="blazor-context-menu">
+    <Item OnClick="@UpdateChat" CssClass="blazor-context-menu__item"><img class="update-img" src="images/update.png">Update</Item>
+    <Item OnClick="@DeleteChat" CssClass="context-delete-item"><img class="delete-img" src="images/delete.png" />Delete</Item>
 </ContextMenu>
+
 
 <div class="header">
     <h3>Chats</h3>
@@ -35,7 +28,6 @@
         <div class="popup-content">
             <h4>Add New Chat</h4>
             <input @bind="newChatName" placeholder="Chat Name" />
-            <input @bind="newAdditionalId" placeholder="Additional Id" />
             <input @bind="newUrl" placeholder="URL" />
             <button @onclick="AddChat">Add</button>
             <button @onclick="TogglePopup">Cancel</button>
@@ -43,18 +35,26 @@
     </div>
 }
 
+<!-- Обновление переменной id что бы она не накапливалась. Не самый хороший вариант, лучше потом переделать на састовной id-->
+@if(id > filteredChats.Count)
+{
+    id = 0;
+}
+
 <div class="chat-list-container">
     <ul class="chat-list">
         @foreach (var chat in filteredChats)
         {
-            <ContextMenuTrigger MenuId="myMenu">
-            <li class="chat-item" @onclick="@(() => NavigateToChat(chat.ChatName, chat.AdditionalId, chat.Url))">
-                <div class="chat-info">
-                    <div class="chat-name">@chat.ChatName</div>
-                    <div class="chat-id">@chat.AdditionalId</div>
-                </div>
-            </li>
+                
+            <ContextMenuTrigger MenuId="myMenu" Id="@id.ToString()">
+                <li class="chat-item" @onclick="@(() => NavigateToChat(chat.ChatName, chat.AdditionalId, chat.Url))">
+                    <div class="chat-info">
+                        <div class="chat-name">@chat.ChatName</div>
+                        <div class="chat-id">@chat.AdditionalId</div>
+                    </div>
+                </li>
             </ContextMenuTrigger>
+            id++;
         }
     </ul>
 </div>
@@ -63,14 +63,11 @@
     private List<ChatServer> chats = new List<ChatServer>();
     private List<ChatServer> filteredChats = new List<ChatServer>();
     private bool showPopup = false;
-    private string newChatName;
-    private int newAdditionalId;
-    private string newUrl;
+    private string newChatName = string.Empty;
+    private string newUrl = string.Empty;
     private string searchQuery = string.Empty;
-    private bool showContextMenu = false;
-    private int menuLeft;
-    private int menuTop;
-    private ChatServer selectedChat;
+    private int id = 0;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -117,20 +114,25 @@
         StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
     }
 
-
-
-
-
-    private void DeleteChat(ChatServer chat)
+    private async Task DeleteChat(ItemClickEventArgs e)
     {
-        // Логика для удаления чата
-        showContextMenu = false;
-        StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
+        var idString = e.ContextMenuTrigger.Id;
+        int id;
+        if(int.TryParse(idString,out id))
+        {
+            await ChatService.DeleteChatAsync(filteredChats[id].ChatName, filteredChats[id].AdditionalId);
+        }
+        chats = await ChatService.GetChats();
+        filteredChats = chats;
+        StateHasChanged();
+    }
+
+    private void UpdateChat(ItemClickEventArgs e)
+    {
     }
     void OnClick(ItemClickEventArgs e)
     {
         Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
+
     }
 }
-
-
