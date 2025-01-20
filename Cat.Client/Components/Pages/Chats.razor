@@ -10,27 +10,32 @@
     <Item OnClick="@DeleteChat" CssClass="context-delete-item"><img class="delete-img" src="images/delete.png" />Delete</Item>
 </ContextMenu>
 
-
 <div class="header">
-    <h3>Chats</h3>
+    <img class="menu-image" src="images/menu.png" />
     <div class="search-container">
         <img src="images/find.png" alt="Search icon" class="search-icon" />
         <input class="search-input" value="@searchQuery" @oninput="OnSearchQueryChanged" placeholder="Search chats..." />
     </div>
-    <button class="add-chat-button" @onclick="TogglePopup">
+    <button class="add-chat-button" @onclick="ShowAddChatMenu">
         <img class="add-chat-img" src="images/plus.png">
     </button>
 </div>
 
-@if (showPopup)
+@if (showAddMenu)
 {
     <div class="popup">
         <div class="popup-content">
             <h4>Add New Chat</h4>
             <input @bind="newChatName" placeholder="Chat Name" />
             <input @bind="newUrl" placeholder="URL" />
-            <button @onclick="AddChat">Add</button>
-            <button @onclick="TogglePopup">Cancel</button>
+            @if (fatalAddChat)
+            {
+
+            }
+            <div class="button-container">
+                <button @onclick="AddChat">Add</button>
+                <button @onclick="ShowAddChatMenu">Cancel</button>
+            </div>
         </div>
     </div>
 }
@@ -45,7 +50,6 @@
     <ul class="chat-list">
         @foreach (var chat in filteredChats)
         {
-                
             <ContextMenuTrigger MenuId="myMenu" Id="@id.ToString()">
                 <li class="chat-item" @onclick="@(() => NavigateToChat(chat.ChatName, chat.AdditionalId, chat.Url))">
                     <div class="chat-info">
@@ -62,12 +66,14 @@
 @code {
     private List<ChatServer> chats = new List<ChatServer>();
     private List<ChatServer> filteredChats = new List<ChatServer>();
-    private bool showPopup = false;
+    private delegate void ShowMenu();
+    private bool showAddMenu = false;
+    private bool showUpdateMenu = false;
+    private bool fatalAddChat = false;
     private string newChatName = string.Empty;
     private string newUrl = string.Empty;
     private string searchQuery = string.Empty;
     private int id = 0;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,24 +81,55 @@
         filteredChats = chats; // Инициализируем фильтрованный список
     }
 
-    private void TogglePopup()
+    /// <summary>
+    /// Метод для обновления состояния меню добавления чата.
+    /// </summary>
+    private void ShowAddChatMenu() => showAddMenu = !showAddMenu;
+
+    /// <summary>
+    /// Метод для обновления состояния меню обновления чата.
+    /// </summary>
+    private void ShowUpdateChatMenu() => showUpdateMenu = !showUpdateMenu;
+
+    private void ShowFatalAddChat() => fatalAddChat = !fatalAddChat;
+
+    /// <summary>
+    /// Добавление нового чата
+    /// </summary>
+    private async void AddChat()
     {
-        showPopup = !showPopup;
+        if(await ChatService.AddChatAsync(newChatName, newUrl))
+        {
+            await  UpdateChatsList(new ShowMenu(ShowAddChatMenu));
+        }
+        else
+        {
+            ShowFatalAddChat();
+        }
     }
 
-    private async Task AddChat()
+    /// <summary>
+    /// Обновление списка чатов
+    /// </summary>
+    /// <param name="showMenu">Параметор отвечающий за показ меню в зависимости от ситуации</param>
+    /// <returns></returns>
+    private async Task UpdateChatsList(ShowMenu showMenu)
     {
-        await ChatService.AddChatAsync(newChatName, newUrl);
-        TogglePopup();
         chats = await ChatService.GetChats(); // Заново загружаем список чатов
         filteredChats = chats; // Обновляем фильтрованный список
         StateHasChanged(); // Уведомляем Blazor о необходимости перерисовки компонента
     }
 
+    /// <summary>
+    /// Метод для перехода на страницу чата.
+    /// </summary>
+    /// <param name="chatName">Имя чата</param>
+    /// <param name="additionalId">Дополнитеный id для определения конкретного чата</param>
+    /// <param name="url">url чата</param>
     private void NavigateToChat(string chatName, int additionalId, string url)
     {
         var queryString = $"chatName={Uri.EscapeDataString(chatName)}&additionalId={additionalId}&url={Uri.EscapeDataString(url)}";
-        NavigationManager.NavigateTo($"/chatdetail?{queryString}");
+        NavigationManager.NavigateTo($"/chat");
     }
 
     private void OnSearchQueryChanged(ChangeEventArgs e)
@@ -127,12 +164,15 @@
         StateHasChanged();
     }
 
-    private void UpdateChat(ItemClickEventArgs e)
+    private async void UpdateChat(ItemClickEventArgs e)
     {
+        var idString = e.ContextMenuTrigger.Id;
+        int id;
+
     }
+
     void OnClick(ItemClickEventArgs e)
     {
         Console.WriteLine($"Item Clicked => Menu: {e.ContextMenuId}, MenuTarget: {e.ContextMenuTargetId}, IsCanceled: {e.IsCanceled}, MenuItem: {e.MenuItemElement}, MouseEvent: {e.MouseEvent}");
-
     }
 }

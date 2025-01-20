@@ -38,10 +38,10 @@ namespace Cat.Client.Infrastructure.Services
                 }
 
                 //  Поиск чатов, которые имеют такое же имя как у чата, который мы добавляем.
-                var listChats = _dbContext.ChatServers
+                var listChats = await _dbContext.ChatServers
                                             .Where(c => c.ChatName == name)
                                             .Select(c => c.AdditionalId)
-                                            .ToList();
+                                            .ToListAsync();
                 var chat = new ChatServer
                 {
                     ChatName = name,
@@ -80,8 +80,8 @@ namespace Cat.Client.Infrastructure.Services
                 }
 
                 //  Поиск чата для обновления
-                var chat = _dbContext.ChatServers
-                                            .FirstOrDefault(c => c.ChatName == name && c.AdditionalId == subId);
+                var chat = await _dbContext.ChatServers
+                                            .FirstOrDefaultAsync(c => c.ChatName == name && c.AdditionalId == subId);
 
                 if (chat == null)
                 {

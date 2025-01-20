@@ -4,7 +4,9 @@
 <h3>Chat</h3>
 
 <input @bind="user" placeholder="User" />
+<input @bind="group" placeholder="Group" />
 <input @bind="message" placeholder="Message" />
+<button @onclick="JoinGroup">Join Group</button>
 <button @onclick="SendMessage">Send</button>
 
 <ul>
@@ -18,12 +20,13 @@
     private HubConnection hubConnection;
     private string user;
     private string message;
+    private string group; // Новая переменная для группы
     private List<string> messages = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5297/chathub")
+            .WithUrl("https://gotylib-cat-server-ac52.twc1.net/chathub")
             .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
@@ -35,11 +38,19 @@
         await hubConnection.StartAsync();
     }
 
+    private async Task JoinGroup()
+    {
+        if (!string.IsNullOrEmpty(group))
+        {
+            await hubConnection.InvokeAsync("JoinGroup", group);
+        }
+    }
+
     private async Task SendMessage()
     {
-        if (!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(message))
+        if (!string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(message) && !string.IsNullOrEmpty(group))
         {
-            await hubConnection.InvokeAsync("SendMessage", user, message);
+            await hubConnection.InvokeAsync("SendMessage", group, user, message);
             message = string.Empty;
         }
     }

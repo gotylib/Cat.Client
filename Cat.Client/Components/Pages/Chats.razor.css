@@ -48,7 +48,16 @@
 }
 
 
+.menu-image {
+    margin-left: 0.5%;
+    margin-top: 10px;
+    width: 25px;
+    height: 25px;
+}
 
+    .menu-image:hover {
+        filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(5000%) hue-rotate(220deg) brightness(90%) contrast(110%);
+    }
 
 .add-chat-button {
     background: none; /* Убираем фон кнопки */
@@ -83,6 +92,7 @@
     }
 }
 
+
 .popup {
     position: fixed;
     top: 0;
@@ -103,6 +113,8 @@
 }
 
     .popup-content input {
+        border: 1px solid #ccc;
+        border-radius: 10px;
         display: block;
         margin-bottom: 10px;
         padding: 10px;
@@ -110,9 +122,52 @@
         box-sizing: border-box;
     }
 
-    .popup-content button {
-        margin-right: 10px;
+        .popup-content input:hover {
+            background-color: #f0f0f0;
+            
+        }
+
+        .popup-content input:focus {
+            outline: none; /* Убираем стандартное обрамление браузера */
+            border: 1px solid #ccc; /* Оставляем тот же цвет границы */
+        }
+
+    .popup-content .button-container {
+        display: flex;
+        margin-top: 10px; /* Отступ сверху для кнопок */
     }
+
+    .popup-content button {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px; /* Увеличиваем отступы для кнопок */
+        flex-grow: 1; /* Позволяет кнопкам занимать равное пространство */
+        margin-right: 10px; /* Отступ между кнопками */
+        font-size: 14px; /* Уменьшаем размер шрифта */
+    }
+
+        .popup-content button:last-child {
+            margin-right: 0; /* Убираем отступ у последней кнопки */
+        }
+            .popup-content button:last-child:hover {
+                color: red;
+                background-color: #f0f0f0;
+            }
+
+        .popup-content button:hover {
+            color: blue;
+            background-color: #f0f0f0;
+        }
+
+
+    /* Добавим стиль для кнопок, чтобы они всегда имели одинаковую ширину */
+    .popup-content .button-container button {
+        min-width: 100px; /* Минимальная ширина кнопок */
+    }
+
+
+
 
 .chat-list-container {
     flex: 1;
