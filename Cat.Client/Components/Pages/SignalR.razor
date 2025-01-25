@@ -26,7 +26,7 @@
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://gotylib-cat-server-ac52.twc1.net/chathub")
+            .WithUrl("http://185.221.197.115:8080/chathub")
             .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>

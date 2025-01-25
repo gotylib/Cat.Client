@@ -1,0 +1,41 @@
+﻿<!-- PopupMenu.razor -->
+@code {
+    private bool isVisible = false;
+    private string positionStyle = "position: absolute; display: none;";
+
+    public void ShowMenu(int x, int y)
+    {
+        isVisible = true;
+        positionStyle = $"position: absolute; left: {x}px; top: {y}px; display: block;";
+    }
+
+    public void HideMenu()
+    {
+        isVisible = false;
+        positionStyle = "position: absolute; display: none;";
+    }
+}
+
+@if (isVisible)
+{
+    <div style="@positionStyle" class="popup-menu">
+        <ul>
+            <li @onclick="UpdateChat">Update</li>
+            <li @onclick="DeleteChat">Delete</li>
+        </ul>
+    </div>
+}
+
+@code {
+    private void UpdateChat()
+    {
+        // Логика обновления чата
+        HideMenu();
+    }
+
+    private void DeleteChat()
+    {
+        // Логика удаления чата
+        HideMenu();
+    }
+}

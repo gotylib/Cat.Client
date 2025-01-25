@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Cat.Client.Infrastructure.Services;
 using Cat.Client.Infrastructure.Handlers;
+using MudBlazor.Services;
 
 
 
@@ -29,6 +30,8 @@ namespace Cat.Client
             builder.Services.AddDbContext<CatClientDbContext>();
 
             builder.Services.AddHttpClient();
+
+            builder.Services.AddMudServices();
 
             var dbContext = new CatClientDbContext();
             dbContext.Database.EnsureCreated();
