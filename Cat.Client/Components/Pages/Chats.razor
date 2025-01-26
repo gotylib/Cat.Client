@@ -126,11 +126,13 @@
     /// <param name="chatName">Имя чата</param>
     /// <param name="additionalId">Дополнитеный id для определения конкретного чата</param>
     /// <param name="url">url чата</param>
+
     private void NavigateToChat(string chatName, int additionalId, string url)
     {
         var queryString = $"chatName={Uri.EscapeDataString(chatName)}&additionalId={additionalId}&url={Uri.EscapeDataString(url)}";
-        NavigationManager.NavigateTo($"/chat");
+        NavigationManager.NavigateTo($"/chat?{queryString}");
     }
+    
 
     private void OnSearchQueryChanged(ChangeEventArgs e)
     {

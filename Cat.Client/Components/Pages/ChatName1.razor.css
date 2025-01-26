@@ -1,73 +1,144 @@
-﻿.chat-container {
+﻿html, body {
+    margin: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    box-sizing: border-box;
+    width: 100%; /* Занимает всю ширину экрана */
+    height: 100vh; /* Занимает всю высоту экрана */
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .message-box {
     flex: 1;
-    overflow-y: auto;
-    background-color: #f0f0f0;
-    font-size: calc(16px + 0.5vw); /* Адаптивный размер шрифта */
-    margin: 0; /* Убедитесь, что нет внешних отступов */
-    padding: 0; /* Убедитесь, что нет внутренних отступов */
+    padding: 20px;
+    overflow-y: auto; /* Добавляем прокрутку */
+    background-color: #ece5dd;
+    display: flex;
+    flex-direction: column;
 }
 
-    .message-box p {
-        margin: 10px; /* Отступы для параграфов */
-        padding: 10px; /* Внутренние отступы для параграфов */
+.message {
+    position: relative;
+    margin-bottom: 15px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
 
+    .message.sent {
+        align-self: flex-end;
     }
+
+        .message.sent .message-content {
+            background-color: #dcf8c6;
+            color: #000000;
+            border-radius: 15px 15px 0 15px;
+            position: relative;
+            padding: 10px 15px;
+        }
+
+    .message.received {
+        align-self: flex-start;
+    }
+
+        .message.received .message-content {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px 15px 15px 0;
+            position: relative;
+            padding: 10px 15px;
+        }
+
+    /* Хвостик для отправленных сообщений */
+    .message.sent .message-content::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: -13px; /* Смещаем хвостик вправо */
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-left-color: #dcf8c6; /* Цвет хвостика совпадает с цветом сообщения */
+        border-bottom: 0; /* Убираем нижнюю границу */
+    }
+
+    /* Хвостик для полученных сообщений */
+    .message.received .message-content::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: -13px; /* Смещаем хвостик влево */
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-right-color: #ffffff; /* Цвет хвостика совпадает с цветом сообщения */
+        border-bottom: 0; /* Убираем нижнюю границу */
+    }
+
+.message-time {
+    font-size: 12px;
+    color: #888888;
+    margin-top: 5px;
+    text-align: right;
+}
 
 .chat-input-container {
     display: flex;
     align-items: center;
-    border-top: 1px solid #ccc;
-    background-color: #f7f7f7;
-    box-sizing: border-box;
-    width: 100%;
-    position: sticky;
+    padding: 10px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    position: sticky; /* Прижимаем контейнер ввода к нижней части */
     bottom: 0;
-    z-index: 10;
 }
 
     .chat-input-container input {
         flex: 1;
-        border: 1px solid #ccc;
-        border-radius: 20px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 25px;
         margin: 0 10px;
         outline: none;
-        box-sizing: border-box; /* Убедитесь, что включает padding и border */
-    }
-
-    .chat-input-container button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        box-sizing: border-box; /* Убедитесь, что включает padding и border */
     }
 
 .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    box-sizing: border-box; /* Убедитесь, что включает padding и border */
 }
 
-.add-file-button {
-    background-color: #e0e0e0;
-}
-
-.send-message-button {
-    background-color: #8147fc;
-    color: #fff;
-}
-
-    .send-message-button svg {
-        width: 20px;
-        height: 20px;
+    .btn-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor; /* Используем текущий цвет текста */
     }
+
+/* Эффект наведения для иконок */
+.add-file-button:hover svg,
+.send-message-button:hover svg {
+    color: #0056b3; /* Цвет иконки при наведении (можете выбрать свой оттенок) */
+}
+
+.add-file-button svg {
+    color: #007aff; /* Исходный цвет иконки "добавить файл" */
+}
+
+.send-message-button svg {
+    color: #007aff; /* Исходный цвет иконки "отправить сообщение" */
+}
+
+
+

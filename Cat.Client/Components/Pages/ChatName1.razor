@@ -1,29 +1,17 @@
-﻿@page "/chatdetail"
+﻿@page "/chat"
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 
 <div class="chat-container">
     <div class="message-box">
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-        <p>Сообщение 1</p>
-        <p>Сообщение 2</p>
-        <p>Сообщение 3</p>
-
-        <!-- Добавьте больше сообщений по необходимости -->
+        @foreach (var msg in messages)
+        {
+            <div class="message @(msg.Sender == ChatName ? "sent" : "received")">
+                <div class="message-content">@msg.Content</div>
+                <div class="message-time">@msg.Time</div>
+            </div>
+        }
     </div>
 
     <div class="chat-input-container">
@@ -33,8 +21,8 @@
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
         </button>
-        <input type="text" placeholder="Type a message..." />
-        <button class="btn-icon send-message-button">
+        <input type="text" placeholder="Type a message..." @bind="newMessage" />
+        <button class="btn-icon send-message-button" @onclick="SendMessage">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -44,20 +32,75 @@
 </div>
 
 @code {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string ChatName { get; set; }
+    @code {
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string ChatName { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public int AdditionalId { get; set; }
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public int AdditionalId { get; set; }
 
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string Url { get; set; }
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string Url { get; set; }
 
-    protected override void OnInitialized()
-    {
-        // Use ChatName, AdditionalId, and Url as needed
+        private HubConnection hubConnection;
+        private string newMessage;
+        private List<Message> messages = new List<Message>();
+
+        protected override async Task OnInitializedAsync()
+        {
+            if (string.IsNullOrEmpty(Url))
+            {
+                Console.WriteLine("URL is null or empty");
+                return;
+            }
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"{Url}chathub")
+                .Build();
+
+            hubConnection.On<string, string, string>("ReceiveMessage", (user, message, time) =>
+            {
+                messages.Add(new Message { Sender = user, Content = message, Time = time });
+                InvokeAsync(StateHasChanged);
+            });
+
+            try
+            {
+                await hubConnection.StartAsync();
+                await hubConnection.InvokeAsync("JoinGroup", "Test");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error connecting to SignalR hub: {ex.Message}");
+            }
+        }
+
+        private async Task SendMessage()
+        {
+            if (!string.IsNullOrEmpty(newMessage))
+            {
+                var time = DateTime.Now.ToString("HH:mm");
+                await hubConnection.InvokeAsync("SendMessage", "Test", ChatName, newMessage, time);
+                newMessage = string.Empty; // Очищаем поле ввода
+            }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (hubConnection != null)
+            {
+                await hubConnection.DisposeAsync();
+            }
+        }
+
+        private class Message
+        {
+            public string Sender { get; set; }
+            public string Content { get; set; }
+            public string Time { get; set; }
+        }
     }
 }
